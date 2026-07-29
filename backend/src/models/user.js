@@ -7,6 +7,11 @@ module.exports = (sequelize) => {
     instituteName: { type: DataTypes.STRING, allowNull: true, field: 'institute_name' },
     passwordHash: { type: DataTypes.STRING, field: 'password_hash' },
     provider: { type: DataTypes.STRING, defaultValue: 'local' },
+    smtpHost: { type: DataTypes.STRING, allowNull: true, field: 'smtp_host' },
+    smtpPort: { type: DataTypes.INTEGER, allowNull: true, field: 'smtp_port' },
+    smtpUser: { type: DataTypes.STRING, allowNull: true, field: 'smtp_user' },
+    smtpPassword: { type: DataTypes.TEXT, allowNull: true, field: 'smtp_password' },
+    fromEmail: { type: DataTypes.STRING, allowNull: true, field: 'from_email' },
     createdAt: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW, field: 'created_at' }
   }, {
     tableName: 'users',

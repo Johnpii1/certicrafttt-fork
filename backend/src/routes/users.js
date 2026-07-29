@@ -3,11 +3,10 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
-
 const fs = require('fs');
 const path = require('path');
-
 const auth = require('../middleware/auth');
+const { encrypt } = require('../utils/encryption');
 
 const logError = (err) => {
   const logPath = path.join(__dirname, '../../error.log');
@@ -22,7 +21,16 @@ router.post('/register', async (req, res) => {
   const passwordHash = await bcrypt.hash(password, 10);
   const user = await User.create({ email, fullName, passwordHash, instituteName });
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'dev-secret');
-  res.json({ token, id: user.id, email: user.email, fullName: user.fullName, instituteName: user.instituteName });
+  res.json({ 
+    token, 
+    id: user.id, 
+    email: user.email, 
+    fullName: user.fullName, 
+    instituteName: user.instituteName,
+    smtpUser: user.smtpUser,
+    fromEmail: user.fromEmail,
+    hasSmtpKey: !!user.smtpPassword
+  });
 });
 
 router.post('/login', async (req, res) => {
@@ -32,20 +40,54 @@ router.post('/login', async (req, res) => {
   const ok = await bcrypt.compare(password, user.passwordHash || '');
   if (!ok) return res.status(401).json({ message: 'Invalid credentials' });
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'dev-secret');
-  res.json({ token, id: user.id, email: user.email, fullName: user.fullName, instituteName: user.instituteName });
+  res.json({ 
+    token, 
+    id: user.id, 
+    email: user.email, 
+    fullName: user.fullName, 
+    instituteName: user.instituteName,
+    smtpUser: user.smtpUser,
+    fromEmail: user.fromEmail,
+    hasSmtpKey: !!user.smtpPassword
+  });
 });
 
 router.put('/settings', auth, async (req, res) => {
   try {
-    const { fullName, instituteName } = req.body;
+    const { fullName, instituteName, smtpHost, smtpPort, smtpUser, smtpPassword, fromEmail } = req.body;
     const user = await User.findByPk(req.user.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    user.fullName = fullName;
-    user.instituteName = instituteName;
+    if (fullName !== undefined) user.fullName = fullName;
+    if (instituteName !== undefined) user.instituteName = instituteName;
+    
+    if (smtpHost !== undefined) user.smtpHost = smtpHost || null;
+    if (smtpPort !== undefined) user.smtpPort = smtpPort ? parseInt(smtpPort) : null;
+    if (smtpUser !== undefined) user.smtpUser = smtpUser || null;
+
+    if (smtpPassword !== undefined) {
+      if (smtpPassword === '') {
+        user.smtpPassword = null;
+      } else if (smtpPassword !== '********') {
+        user.smtpPassword = encrypt(smtpPassword);
+      }
+    }
+    
+    if (fromEmail !== undefined) {
+      user.fromEmail = fromEmail || null;
+    }
+    
     await user.save();
 
-    res.json({ id: user.id, email: user.email, fullName: user.fullName, instituteName: user.instituteName });
+    res.json({ 
+      id: user.id, 
+      email: user.email, 
+      fullName: user.fullName, 
+      instituteName: user.instituteName,
+      smtpUser: user.smtpUser,
+      fromEmail: user.fromEmail,
+      hasSmtpKey: !!user.smtpPassword
+    });
   } catch (error) {
     logError(error);
     res.status(500).json({ error: 'Failed to update settings' });

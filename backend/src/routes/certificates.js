@@ -267,6 +267,21 @@ router.post('/:id/send-email', auth, async (req, res) => {
       }
     }
 
+    const { User } = require('../models');
+    const { decrypt } = require('../utils/encryption');
+    const user = await User.findByPk(req.user.id);
+    
+    let customSmtp = null;
+    if (user.smtpHost && user.smtpUser && user.smtpPassword) {
+      customSmtp = {
+        host: user.smtpHost,
+        port: user.smtpPort,
+        user: user.smtpUser,
+        password: decrypt(user.smtpPassword)
+      };
+    }
+    const fromEmail = user.fromEmail;
+
     const result = await sendEmail({
       to: cert.Participant.email,
       subject: `Certificate for ${cert.Event.eventName}`,
@@ -282,7 +297,9 @@ router.post('/:id/send-email', auth, async (req, res) => {
           <p>Best regards,<br/>The CertiCraft Team</p>
         </div>
       `,
-      attachments
+      attachments,
+      customSmtp,
+      fromEmail
     });
 
     // Clean up temporary file if created
@@ -364,8 +381,23 @@ router.post('/events/:eventId/send-all', auth, checkEventOwnership, async (req, 
       return res.json({ message: 'No certificates to send.' });
     }
 
+    const { User } = require('../models');
+    const { decrypt } = require('../utils/encryption');
+    const user = await User.findByPk(req.user.id);
+    
+    let customSmtp = null;
+    if (user.smtpHost && user.smtpUser && user.smtpPassword) {
+      customSmtp = {
+        host: user.smtpHost,
+        port: user.smtpPort,
+        user: user.smtpUser,
+        password: decrypt(user.smtpPassword)
+      };
+    }
+    const fromEmail = user.fromEmail;
+
     const { sendBatchEmails } = require('../utils/email');
-    const result = await sendBatchEmails(emailPayloads);
+    const result = await sendBatchEmails(emailPayloads, customSmtp, fromEmail);
 
     // Cleanup temp files & Update Status
     // Since batch send is all-or-nothing per chunk or returns individual statuses, 
@@ -436,7 +468,22 @@ router.post('/events/:eventId/send-updates', auth, checkEventOwnership, async (r
         `
     }));
 
-    const result = await sendBatchEmails(emailPayloads);
+    const { User } = require('../models');
+    const { decrypt } = require('../utils/encryption');
+    const user = await User.findByPk(req.user.id);
+    
+    let customSmtp = null;
+    if (user.smtpHost && user.smtpUser && user.smtpPassword) {
+      customSmtp = {
+        host: user.smtpHost,
+        port: user.smtpPort,
+        user: user.smtpUser,
+        password: decrypt(user.smtpPassword)
+      };
+    }
+    const fromEmail = user.fromEmail;
+
+    const result = await sendBatchEmails(emailPayloads, customSmtp, fromEmail);
 
     if (result.success) {
       await Promise.all(participants.map(p => p.update({ updateEmailStatus: 'SENT' })));
