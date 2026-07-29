@@ -341,7 +341,8 @@ function EventManagement({ event, onBack, onNotify, initialTab = 'participants' 
             // After triggering, load actual status from backend
             await loadCertificateStatus();
         } catch (error) {
-            showToast('Failed to send email. Check SMTP configuration.', 'error');
+            const msg = error.response?.data?.error || 'Failed to send email.';
+            showToast(msg, 'error');
             await loadCertificateStatus(); // Restore actual status
         }
     };
@@ -358,7 +359,7 @@ function EventManagement({ event, onBack, onNotify, initialTab = 'participants' 
             // No alert as requested
             await loadCertificateStatus();
         } catch (error) {
-            const msg = 'Failed to send emails. Check SMTP configuration.';
+            const msg = error.response?.data?.error || 'Failed to send emails.';
             showToast(msg, 'error');
             onNotify?.('error', msg);
             await loadCertificateStatus();

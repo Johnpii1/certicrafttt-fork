@@ -10,6 +10,9 @@ export const authService = {
                 email: response.data.email,
                 fullName: response.data.fullName,
                 instituteName: response.data.instituteName,
+                smtpUser: response.data.smtpUser,
+                fromEmail: response.data.fromEmail,
+                hasSmtpKey: response.data.hasSmtpKey,
             }));
         }
         return response.data;
@@ -24,6 +27,9 @@ export const authService = {
                 email: response.data.email,
                 fullName: response.data.fullName,
                 instituteName: response.data.instituteName,
+                smtpUser: response.data.smtpUser,
+                fromEmail: response.data.fromEmail,
+                hasSmtpKey: response.data.hasSmtpKey,
             }));
         }
         return response.data;
@@ -37,6 +43,9 @@ export const authService = {
                 ...currentUser,
                 fullName: response.data.fullName,
                 instituteName: response.data.instituteName,
+                smtpUser: response.data.smtpUser,
+                fromEmail: response.data.fromEmail,
+                hasSmtpKey: response.data.hasSmtpKey,
             }));
         }
         return response.data;
