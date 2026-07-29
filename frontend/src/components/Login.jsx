@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authService } from '../services/authService';
 import './Auth.css';
 import LoadingOverlay from './LoadingOverlay';
-
-
 
 function Login() {
     const navigate = useNavigate();
@@ -16,21 +14,6 @@ function Login() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [showRedirectLoading, setShowRedirectLoading] = useState(false);
-
-    // Typing animation logic
-    const fullText = "Streamline your certificate workflow\nwith automated generation and dispatch.";
-    const [displayText, setDisplayText] = useState('');
-    const [index, setIndex] = useState(0);
-
-    useEffect(() => {
-        if (index < fullText.length) {
-            const timeout = setTimeout(() => {
-                setDisplayText(prev => prev + fullText.charAt(index));
-                setIndex(prev => prev + 1);
-            }, 50);
-            return () => clearTimeout(timeout);
-        }
-    }, [index]);
 
     const handleChange = (e) => {
         setFormData({
@@ -49,7 +32,7 @@ function Login() {
             setShowRedirectLoading(true);
             setTimeout(() => {
                 navigate('/dashboard');
-            }, 4000);
+            }, 1000);
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
             setLoading(false);
@@ -57,86 +40,64 @@ function Login() {
     };
 
     const handleGoogleLogin = () => {
-        // Use production backend URL or localhost for development
         const backendUrl = window.location.hostname.includes('render.com')
             ? 'https://certicraft-backendd.onrender.com'
             : 'http://localhost:8080';
-
-        // Start Google OAuth flow on the backend
         window.location.href = `${backendUrl}/auth/google`;
     };
 
     return (
-        <div className="auth-container">
+        <div className="auth-modern-container">
             {showRedirectLoading && <LoadingOverlay />}
-            <div className="auth-card-landscape auth-page-animation">
-                <div className="login-left">
-                    <div className="brand-section fade-in-up">
-                        <div className="logo-placeholder">
-                            <img src="/assets/bharti_logo.png" alt="Bharati Vidyapeeth Logo" className="logo-image" />
-                        </div>
-                        <h1 className="welcome-text">Welcome !</h1>
-                        <div className="typing-container">
-                            <p className="brand-tagline">
-                                {displayText}
-                                <span className="typing-cursor"></span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="features-grid fade-in-up delay-1">
-                        <div className="feature-card">
-                            <span className="feature-icon">⚡</span>
-                            <h3>Fast Generation</h3>
-                            <p>Generate certificates instantly</p>
-                        </div>
-                        <div className="feature-card">
-                            <span className="feature-icon">🔒</span>
-                            <h3>Secure</h3>
-                            <p>Tamper-proof verification</p>
-                        </div>
-                        <div className="feature-card">
-                            <span className="feature-icon">📤</span>
-                            <h3>Easy Dispatch</h3>
-                            <p>Send via email in one click</p>
-                        </div>
-                        <div className="feature-card">
-                            <span className="feature-icon">📊</span>
-                            <h3>Analytics</h3>
-                            <p>Track your event success</p>
+            <div className="auth-modern-card fade-in-up">
+                
+                {/* Left Side: Image & Branding */}
+                <div className="auth-modern-left" style={{ backgroundImage: "url('/assets/auth-hero.png')" }}>
+                    <div className="auth-modern-overlay">
+                        <div className="overlay-text-box">
+                            <h3>EXCLUSIVE FEATURES:</h3>
+                            <p>Be the first to experience our automated dispatch system.</p>
+                            
+                            <h3>PERSONALIZED TEMPLATES:</h3>
+                            <p>Get certificate suggestions tailored to your events.</p>
+                            
+                            <h3>SEAMLESS EXPERIENCE:</h3>
+                            <p>Save your details for faster, more convenient generation.</p>
+                            
+                            <h3>24/7 DEDICATED SUPPORT:</h3>
+                            <p>Enjoy peace of mind with our dedicated support team.</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="login-right fade-in-up delay-2">
-                    <div className="form-header">
-                        <h2>Login Account</h2>
-                        <p className="auth-subtitle">Welcome back! Please enter your details.</p>
+                {/* Right Side: Form */}
+                <div className="auth-modern-right">
+                    <div className="auth-modern-header">
+                        <h2>YOUR GATEWAY TO SEAMLESS CERTIFICATES</h2>
+                        <p>Ready to streamline your workflow? Log in now and let CertiCraft take you there. Your next event is just a click away!</p>
                     </div>
 
                     {error && <div className="alert alert-error">{error}</div>}
 
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label className="form-label">Email</label>
+                    <form onSubmit={handleSubmit} className="auth-modern-form">
+                        <div className="form-group-modern">
+                            <label>Email</label>
                             <input
                                 type="email"
                                 name="email"
-                                className="form-input"
-                                placeholder="Enter your email"
+                                placeholder="Input email"
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label className="form-label">Password</label>
-                            <div className="password-input-wrapper">
+                        <div className="form-group-modern">
+                            <label>Password</label>
+                            <div className="password-wrapper-modern">
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     name="password"
-                                    className="form-input"
                                     placeholder="••••••••"
                                     value={formData.password}
                                     onChange={handleChange}
@@ -144,35 +105,38 @@ function Login() {
                                 />
                                 <button
                                     type="button"
-                                    className="password-toggle"
+                                    className="password-toggle-modern"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    aria-label={showPassword ? "Hide password" : "Show password"}
                                 >
                                     {showPassword ? (
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
                                     ) : (
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                     )}
                                 </button>
                             </div>
                         </div>
 
-                        <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
-                            {loading ? 'Logging in...' : 'Sign in'}
+                        <div className="auth-modern-actions">
+                            <span className="new-user-text">New to CertiCraft? <Link to="/register">Create an Account</Link></span>
+                            <div className="auth-modern-row">
+                                <label className="remember-me">
+                                    <input type="checkbox" /> Remember me
+                                </label>
+                                <a href="#" className="forgot-password">Forgot your password?</a>
+                            </div>
+                        </div>
+
+                        <button type="submit" className="btn-modern-primary" disabled={loading}>
+                            {loading ? 'Logging in...' : 'Login - Continue Working'}
                         </button>
                     </form>
 
-                    <p className="auth-footer">
-                        Don't have an account? <Link to="/register">Sign up</Link>
-                    </p>
+                    <div className="modern-divider">
+                        <span>Or</span>
+                    </div>
 
-                    <div className="btn-divider">OR</div>
-
-                    <button
-                        onClick={handleGoogleLogin}
-                        className="google-btn"
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', border: '1px solid #e5e7eb', background: '#fff', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}
-                    >
+                    <button onClick={handleGoogleLogin} className="btn-modern-sso google">
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="18" height="18" />
                         Sign in with Google
                     </button>
