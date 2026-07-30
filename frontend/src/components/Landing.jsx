@@ -61,7 +61,7 @@ function Landing() {
 
           {/* GET STARTED BUTTON */}
           <Link to="/register">
-            <button className="bg-black rounded-full w-fit  text-white text-sm px-4 py-2">
+            <button className="bg-black rounded-full w-fit  text-white text-sm px-4 py-2 hover:bg-orange-500 hover:text">
               Get Started
             </button>
           </Link>
